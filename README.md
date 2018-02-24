@@ -27,11 +27,10 @@ or
 $ npm install --save-dev flow-coverage-report
 ```
 
-Run the flow reporter (`-i` configures the include globs, `-x` the exclude patterns,
-and `-t` the report types enabled):
+Run the flow reporter (`-i` configures the include globs, `-x` the exclude patterns, `--threshold` to configure a minimum coverage below which the build should fail, which defaults to 80%, and `-t` the report types enabled):
 
 ```
-flow-coverage-report -i 'src/**/*.js' -i 'src/**/*.jsx' -x 'src/test/**' -t html -t json -t text
+flow-coverage-report -i 'src/**/*.js' -i 'src/**/*.jsx' -x 'src/test/**' -t html -t json -t text --threshold 90
 ```
 
 If the **flow** executable is not in your PATH, you can specified it using the
@@ -45,6 +44,58 @@ To customize the output dir (which defaults to `flow-coverage/`). you can use th
 
 ```
 flow-coverage-report -o my-custom-flow-coverage-dir/
+```
+
+### Load default options from a JSON config file
+
+The `--config` flag allows specifying a path to a config file. The config file
+is a JSON file with the following structure:
+
+``` json
+{
+  "concurrentFiles": 1,
+  "excludeGlob": [
+    "node_modules/**"
+  ],
+  "flowCommandPath": "path/to/flow/bin",
+  "includeGlob": [
+    "src/**/*.js"
+  ],
+  "outputDir": "path/to/output",
+  "projectDir": "path/to/project",
+  "threshold": 90,
+  "type": "text"
+}
+```
+
+`type` can be one of `"text"`, `"html"`, or `"json"`. The default is `"text"`.
+
+### Load default options from package.json
+
+For an npm package, the default options can also be configured by including them in a
+"flow-coverage-report" package.json property property:
+
+```json
+{
+  "name": "my-npm-package",
+  "version": "1.0.1",
+  "scripts": {
+    "flow-coverage": "flow-coverage-report",
+    ...
+  },
+  ...
+  "flow-coverage-report": {
+    "includeGlob": [
+      "src/lib/**/*.js",
+      "src/lib/**/*.jsx"
+    ],
+    "type": [
+      "text",
+      "html",
+      "json"
+    ]
+  }
+}
 ```
 
 ## Background
@@ -77,6 +128,29 @@ You have just found it ;-)
 [screenshot-sourcefile]: https://raw.githubusercontent.com/rpl/flow-coverage-report/master/doc/screenshot-sourcefile.png
 
 ## Changelog
+
+### 0.4.1
+
+Bug Fixes:
+
+- fixed wrong annotation on multiple pragmas on the same line (#135)
+
+Thanks to Ryan Albrecht and Karolis Grinkevičius for their help on this bugfix release.
+
+### 0.4.0
+
+Features:
+
+- collect and report flow preamble annotation type along with coverage information (thanks to Ryan Albrecht)
+
+Bug Fixes:
+
+- fixed bug related to ignored custom threshold in the rendered HTML report (thanks to Boris Egorov)
+- fixed coverage percent 0 rendered as NaN in report text
+- upgraded flow to v.0.57.3 and fixed new flow error (Julien Wajsberg)
+- fix flow coverage for escaped special chars in filenames
+
+Thanks to Ryan Albrecht, Boris Egorov, Julien Wajsberg for their help on this new release.
 
 ### 0.3.0
 
